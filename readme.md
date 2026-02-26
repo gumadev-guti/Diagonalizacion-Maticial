@@ -9,7 +9,7 @@
 
 
 
-El sistema fue creado para en trabajo de clases, el cual obtuvo una puntuacion de cinco puntos. En el se plantea com utilizar la diagonalizacion de matrices en sistemas informaticos y como estas pueden acelerar procesos de busqueda o relaciones entre elementos. En el archivo documento.doc esta la explicacion del proyecto
+El sistema fue creado para un trabajo de clases, el cual obtuvo una puntuacion de 5 puntos. En el se plantea como utilizar la diagonalizacion de matrices en sistemas informaticos y como estas pueden acelerar procesos de busqueda o relaciones entre elementos. En el archivo documento.doc esta la explicacion del proyecto
 
 
 
