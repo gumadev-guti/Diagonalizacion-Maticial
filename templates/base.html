@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}App{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* Botón flotante */
+        #mathBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 12px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Modal */
+        #mathModal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        #mathModalContent {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 8px;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        #mathClose {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 4px 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+
+    <!-- Botón flotante -->
+    <button id="mathBtn">📊 Ver Matemáticas</button>
+
+    <!-- Modal -->
+    <div id="mathModal">
+        <div id="mathModalContent">
+            <span id="mathClose">&times;</span>
+            <h2>Métricas del sistema de recomendación</h2>
+            <div id="mathContent">
+                <p>Cargando datos...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/script.js"></script>
+    <script>
+        // Abrir modal
+        const mathBtn = document.getElementById("mathBtn");
+        const mathModal = document.getElementById("mathModal");
+        const mathClose = document.getElementById("mathClose");
+        const mathContent = document.getElementById("mathContent");
+
+        mathBtn.onclick = () => {
+            mathModal.style.display = "block";
+            updateMathModal(); // cargar info al abrir
+        };
+
+        mathClose.onclick = () => {
+            mathModal.style.display = "none";
+        };
+
+        window.onclick = (event) => {
+            if (event.target == mathModal) {
+                mathModal.style.display = "none";
+            }
+        };
+
+        // Función que se llamará desde el JS principal para actualizar modal
+        async function updateMathModal() {
+            try {
+                const res = await fetch("/get-math-info");
+                if (!res.ok) {
+                    mathContent.innerHTML = "<p>Error al obtener datos.</p>";
+                    return;
+                }
+                const data = await res.json();
+                let html = `<p><b>Vector de gustos (q):</b> [${data.q.map(v => v.toFixed(3)).join(", ")}]</p>`;
+                html += `<p><b>Autovalores:</b> [${data.eigvals.map(v => v.toFixed(3)).join(", ")}]</p>`;
+                html += `<p><b>Autovector dominante (v1):</b> [${data.v1.map(v => v.toFixed(3)).join(", ")}]</p>`;
+                html += "<h3>Matriz diagonal (D)</h3><table><tr>";
+                data.D.forEach(row => {
+                    html += "<tr>" + row.map(x => `<td>${x.toFixed(3)}</td>`).join("") + "</tr>";
+                });
+                html += "</table>";
+                mathContent.innerHTML = html;
+            } catch (e) {
+                console.error("Error fetch math info:", e);
+                mathContent.innerHTML = "<p>Error al cargar datos.</p>";
+            }
+        }
+
+        // Actualizar modal cada 5 segundos si está abierta
+        setInterval(() => {
+            if (mathModal.style.display === "block") {
+                updateMathModal();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
